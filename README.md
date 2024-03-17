@@ -8,6 +8,7 @@ frequently Start and ending session and view multi url (e.g. cardekho.com and co
 
 
 ![image](https://github.com/cool-deep-96/redscope_cool_deep_96_assignment/assets/143888090/6066be2d-592b-42c6-ae48-8f7cb3a96490)
+<br>
 part 3 done sessonId is sent with data sent chrome plugin
 
 
