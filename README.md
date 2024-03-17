@@ -4,7 +4,8 @@ Initially plugin websocket is disconnected
 <br>
 
 
-![image](https://github.com/cool-deep-96/redscope_cool_deep_96_assignment/assets/143888090/d6583f05-5786-47d7-89d0-9a22014ad564)
+![image](https://github.com/cool-deep-96/redscope_cool_deep_96_assignment/assets/143888090/093e05e6-6da8-4186-ba33-8586e9c9871d)
+
 Start/End  Session using button at home route (http://localhost:3000) and  SessionId is shown if websocket is connected on the Options page of chrome extension
 .........
 Part 1 and Part 4 done
