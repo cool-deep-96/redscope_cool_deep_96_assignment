@@ -26,8 +26,9 @@
   <script>
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get('id');
+    const sessionid = searchParams.get('sessionid');
 
-    const apiUrl = `http://localhost:3000/api-rrweb-events?id=${id}`
+    const apiUrl = `http://localhost:3000/api-rrweb-events?id=${id}&sessionid=${sessionid}`
     fetch(apiUrl)
     .then(response => response.json())
     .then(data => {

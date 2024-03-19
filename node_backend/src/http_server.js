@@ -20,15 +20,16 @@ const startHttpServer = () => {
 
   // Nested routing (api/rrweb_events) is a bit tricky, leaving for the take home assignment
   app.get('/api-rrweb-events', (req, res) => {
-    return res.send(fetchRrwebEvents(req.query.id));
+    console.log(req.query);
+    return res.send(fetchRrwebEvents(req.query.id, req.query.sessionid));
   });
 
   const port = 3000;
   app.listen(port, () => console.log(`Server listening on port ${port}`));
 }
 
-const fetchRrwebEvents = (id) => {
-  const dataFilePath = path.join(dataFolderName, id.toString())
+const fetchRrwebEvents = (id, sessionId) => {
+  const dataFilePath = path.join(dataFolderName, sessionId, id.toString())
   const rrwebEvents = fs.readFileSync(dataFilePath, 'utf-8');
   return rrwebEvents.split("\n").filter(line => line.length > 0).map(ff => JSON.parse(ff));
 }
