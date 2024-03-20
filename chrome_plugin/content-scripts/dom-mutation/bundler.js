@@ -9,10 +9,10 @@
  * web socket
  */
 
-
-
+function startRecording(){
   rrweb.record({
     emit(event) {
+      console.log(event);
       const url = window.top.location.href;
       const payload = {
         url: url,
@@ -24,15 +24,16 @@
       chrome.runtime.sendMessage(payload);
     }
   });
+}
 
+function endRecording(){
+  rrweb.stop();
+}
 
-var button=document.getElementsByClassName('websocket')
-
-button[0].addEventListener('click', ()=>{
-  chrome.runtime.sendMessage({action: "connectToWebSocket"});
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if(message.rrweb){
+    startRecording();
+  }
 })
 
-button[1].addEventListener('click', ()=>{
-  chrome.runtime.sendMessage({action: "diconnectFromWebSocket"});
-})
 

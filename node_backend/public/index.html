@@ -15,7 +15,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 50px;
+    gap: 25px;
   }
 
 
@@ -39,7 +39,7 @@
     font-size: large;
     font-weight: bold;
     background-color: darkslateblue;
-    color: white ;
+    color: white;
   }
 
 
@@ -49,61 +49,80 @@
     color: aqua;
     letter-spacing: 2px;
   }
+
+  input {
+    padding: 10px;
+    font-size: larger;
+    border-radius: 10px;
+    letter-spacing: 2px;
+
+  }
 </style>
 
 <body>
 
 
   <div class="content-container">
-    <button class="websocket">Start Session</button>
-    <button class="websocket">End Session</button>
+    <button class="websocket" onclick="startSession()">Start Session</button>
+    <button class="websocket" onclick="stopSession()">Stop Session</button>
   </div>
+
+  <label for="messageInput"></label>
+  <input type="text" id="messageInput" placeholder="sessionId" />
+  <button onclick="sendMessage()">Send</button>
+  <div id="messages" class="cool_deep_96"></div>
 
   <div class="cool_deep_96">
     By:- Kuldeep Kumar
   </div>
 
 
-
-
-
-
-
-
-
-
-
-
-
-  <!-- <label for="messageInput"></label>
-        <input type="text" id="messageInput" />
-        <button onclick="sendMessage()">Send</button>
-        <div id="messages"></div> -->
-
   <script>
-    // const ws = new WebSocket('ws://localhost:3008');
 
-    // console.log(ws);
+    let sessionWs = null;
 
-    // ws.onopen = () => {
-    //   console.log('WebSocket connected');
-    // };
+    function startSession() {
 
-    // ws.onmessage = (event) => {
-    //   const messagesDiv = document.getElementById('messages');
-    //   messagesDiv.innerHTML += `<p>${event.data}</p>`;
-    // }
+      sessionWs = new WebSocket('ws://localhost:3008');
 
-    // function sendMessage() {
-    //   const messageInput = document.getElementById('messageInput');
-    //   const payload = {
-    //     'type': 'session Id Change',
-    //     'url':window.top.location.href,
-    //     'data': messageInput.value,
-    //   }
-    //   ws.send(JSON.stringify(payload));
-    //   messageInput.value = '';
-    // }
+
+      sessionWs.onopen = () => {
+        console.log('WebSocket connected');
+      };
+
+      sessionWs.onmessage = (event) => {
+        const messagesDiv = document.getElementById('messages');
+        messagesDiv.innerHTML = `<p>${event.data}</p>`;
+      }
+
+    }
+
+    function stopSession() {
+      sessionWs.send(JSON.stringify({ session: false }));
+    }
+
+    function sendMessage() {
+
+      const messageInput = document.getElementById('messageInput');
+
+      if (messageInput == '') {
+        alert("sessionId cann't be empty");
+        sessionWs.close();
+      }
+
+      const payload = {
+        type: 'session Id Change',
+        url: window.top.location.href,
+        data: messageInput.value,
+      }
+
+      if (sessionWs) {
+        sessionWs.send(JSON.stringify(payload));
+        messageInput.value = '';
+      } else {
+        alert('Please Start a session');
+      }
+    } 
   </script>
 </body>
 

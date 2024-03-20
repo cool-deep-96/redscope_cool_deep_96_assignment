@@ -2,40 +2,66 @@ import { WebSocketServer } from 'ws';
 import fs from 'fs-extra';
 import { dataFolderName } from './constants.js'
 import path from "path";
-import  {v4 as uuidv4}  from 'uuid';
 
 
 //stores info about connected clients 
-const clients = new Map();
+
+var client = [];
+var sessionId = null;
 
 const startWebSocketServer = () => {
 
   const wss = new WebSocketServer({ port: 3008 });
 
   wss.on('connection', (ws) => {
-    const sessionId = uuidv4();
-    clients.set(ws, sessionId);
+    
+    client.push(ws);
     console.log('WebSocket connection established.');
       
-    //send sessionId of new connected clients;
-    ws.send(JSON.stringify({sessionId}));
+    //send sessionId to all connected clients;
+    client.forEach((ws)=>{
+      ws.send(JSON.stringify({sessionId}));
+    });
+    
 
     // Handle incoming messages
     ws.on('message', (message) => {
+
       const payload = JSON.parse(message.toString());
-      processPayload(payload);
+      console.log(payload);
+
+      //message from index.html to change session
+      if(payload.type === 'session Id Change'){
+        sessionId = payload.data;
+        client.forEach((ws)=>{
+          ws.send(JSON.stringify({sessionId}));
+        });
+      }
+
+      //message from chrome extension rrweb
+      else if(payload.type === 'rrweb events'){
+        processPayload(payload);
+      }
+
+      //messase from index.html to stop session
+      else if(!payload.session){
+        sessionId = null;
+        console.log(sessionId);
+        client.forEach((ws)=>{
+          ws.send(JSON.stringify({sessionId}));
+        });
+      }
+
     });
 
     ws.on('close', ()=>{
-      clients.set(ws, sessionId);
-      console.log('WebSocket connection disconnected')
+      console.log('WebSocket connection disconnected');
     })
   });
 };
 
 //sessions [{sessionId: string, url:string[]}]
 let sessions =[{}];
-
 
 const processPayload = (payload) => {
   const { type, url, data, sessionId} = payload;
@@ -76,20 +102,18 @@ const processPayload = (payload) => {
 
   // sessionId doesn't exist
   else {
-    sessions.push({sessionId: sessionId, urls: [url]});
-    let newDirectory = path.join(dataFolderName, sessionId);
+    if(sessionId){
+      sessions.push({sessionId: sessionId, urls: [url]});
+      let newDirectory = path.join(dataFolderName, sessionId);
+  
+      //creating new directory for new session
+      fs.mkdirSync(newDirectory, { recursive: true });
+      dataFilePath = path.join(newDirectory, "1");
+      console.log(newDirectory, jsonData)
+      fs.writeJsonSync(dataFilePath, jsonData); 
 
-    //creating new directory for new session
-    fs.mkdirSync(newDirectory, { recursive: true }, (err)=>{
-      if(err){
-        console.log('Error in creating new directory => ', err);
-      }else{
+    }
 
-        // writing new file
-        dataFilePath = path.join(newDirectory, "1");
-        fs.writeJSONSync(dataFilePath, jsonData);
-      }
-    })
   }
 
 };
